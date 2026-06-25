@@ -31,7 +31,6 @@
   .field:last-child { margin-bottom: 0; }
   input[type=text], input[type=date], select, textarea { width: 100%; padding: 9px 12px; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); font-size: 14px; background: var(--bg); color: var(--text); outline: none; transition: border-color 0.15s; font-family: inherit; }
   input[type=text]:focus, input[type=date]:focus, select:focus, textarea:focus { border-color: var(--accent); background: #fff; }
-  textarea { resize: vertical; min-height: 60px; }
   .btn { display: inline-flex; align-items: center; gap: 6px; padding: 9px 16px; border-radius: var(--radius-sm); border: 1px solid var(--border-strong); background: var(--surface); font-size: 14px; font-weight: 500; cursor: pointer; color: var(--text); transition: background 0.1s, transform 0.08s; font-family: inherit; }
   .btn:hover { background: var(--bg); }
   .btn:active { transform: scale(0.97); }
@@ -56,11 +55,13 @@
   .custom-row input[type=text] { flex: 1; min-width: 120px; }
   .custom-row input.qty-input { width: 64px; min-width: 64px; flex: 0 0 64px; text-align: center; }
   .order-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; margin-bottom: .75rem; box-shadow: var(--shadow); }
+  .order-card.mine { border-color: var(--accent); }
   .order-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: .5rem; }
   .order-person { font-weight: 600; font-size: 15px; }
   .order-date { font-size: 12px; color: var(--text-faint); }
   .order-item { display: flex; justify-content: space-between; font-size: 13px; padding: 3px 0; color: var(--text-muted); }
   .order-item .qty-tag { font-weight: 600; color: var(--text); background: var(--bg); padding: 1px 7px; border-radius: 10px; font-size: 12px; }
+  .order-actions { display: flex; gap: 6px; margin-top: .75rem; padding-top: .75rem; border-top: 1px solid var(--border); }
   .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 1.25rem; }
   .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: .75rem; text-align: center; box-shadow: var(--shadow); }
   .stat-val { font-size: 22px; font-weight: 700; color: var(--accent); }
@@ -88,7 +89,8 @@
   .section-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: .75rem; }
   .section-head h2 { font-size: 16px; font-weight: 600; }
   select { appearance: auto; }
-  .loading { text-align: center; padding: 2rem; color: var(--text-faint); font-size: 14px; }
+  .naam-check { display: flex; gap: 8px; margin-bottom: 1rem; }
+  .naam-check input { flex: 1; }
   @media (max-width: 420px) { .stat-grid { grid-template-columns: repeat(2, 1fr); } }
 </style>
 </head>
@@ -155,6 +157,17 @@
     <h2>Bestellingen</h2>
     <select id="overzicht-trip-select" onchange="renderOverzicht()" style="width:auto;font-size:13px;padding:5px 8px"></select>
   </div>
+
+  <!-- Naam invullen om eigen bestelling te beheren -->
+  <div class="card" style="margin-bottom:1rem">
+    <div class="card-title" style="margin-bottom:.5rem">👤 Jouw naam (om te bewerken/verwijderen)</div>
+    <div class="naam-check">
+      <input type="text" id="overzicht-naam" placeholder="bv. Thomas" />
+      <button class="btn sm primary" onclick="setOverzichtNaam()">OK</button>
+    </div>
+    <div id="overzicht-naam-info" style="font-size:13px;color:var(--text-faint);display:none"></div>
+  </div>
+
   <div class="stat-grid" id="stats-grid"></div>
   <div id="orders-list"></div>
   <div id="totaal-summary"></div>
@@ -206,9 +219,38 @@
   </div>
 </div>
 
+<!-- BEWERK MODAL (simpele overlay) -->
+<div id="edit-overlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:200;overflow-y:auto;padding:1rem">
+  <div style="background:var(--surface);border-radius:var(--radius);max-width:600px;margin:2rem auto;padding:1.25rem">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+      <div style="font-weight:600;font-size:16px">✏️ Bestelling aanpassen</div>
+      <button class="btn sm" onclick="closeEdit()">✕ Sluiten</button>
+    </div>
+    <div id="edit-drank-list"></div>
+    <div style="margin-top:.75rem;border-top:1px solid var(--border);padding-top:.75rem;">
+      <div class="card-title" style="font-size:12px;margin-bottom:.5rem;color:var(--text-faint)">Zelf toevoegen (drank)</div>
+      <div id="edit-drank-custom"></div>
+      <button class="btn sm" onclick="addEditCustomRow('drank')" style="margin-top:6px">+ Rij toevoegen</button>
+    </div>
+    <div style="margin-top:1rem;border-top:1px solid var(--border);padding-top:1rem">
+      <div class="card-title">🚬 Tabak</div>
+      <div id="edit-tabak-list"></div>
+      <div style="margin-top:.75rem;border-top:1px solid var(--border);padding-top:.75rem;">
+        <div class="card-title" style="font-size:12px;margin-bottom:.5rem;color:var(--text-faint)">Zelf toevoegen (tabak)</div>
+        <div id="edit-tabak-custom"></div>
+        <button class="btn sm" onclick="addEditCustomRow('tabak')" style="margin-top:6px">+ Rij toevoegen</button>
+      </div>
+    </div>
+    <div class="btn-row" style="margin-top:1rem">
+      <button class="btn primary" onclick="saveEdit()" style="flex:1;justify-content:center">💾 Opslaan</button>
+      <button class="btn" onclick="closeEdit()">Annuleren</button>
+    </div>
+  </div>
+</div>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, set, get, push, remove, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getDatabase, ref, set, get, push, remove, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyD0lQHa3C7BtARQR-9fjCtMTXb-aMWeWjA",
@@ -225,188 +267,140 @@ const db = getDatabase(app);
 
 const defaultCatalog = {
   drank: [
-    {id:'d1', naam:'Jupiler 24×25cl', eenheid:'pak'},
-    {id:'d2', naam:'Leffe Blond 24×33cl', eenheid:'pak'},
-    {id:'d3', naam:'Duvel 24×33cl', eenheid:'pak'},
-    {id:'d4', naam:'Hoegaarden 24×25cl', eenheid:'pak'},
-    {id:'d5', naam:'Bacardi Carta Blanca 1L', eenheid:'fles'},
-    {id:'d6', naam:'Absolut Vodka 1L', eenheid:'fles'},
-    {id:'d7', naam:'Chivas Regal 12y 1L', eenheid:'fles'},
-    {id:'d8', naam:'Bombay Sapphire 1L', eenheid:'fles'},
-    {id:'d9', naam:'Martini Rosso 1L', eenheid:'fles'},
-    {id:'d10', naam:'Prosecco 75cl', eenheid:'fles'},
+    {id:'d1',naam:'Jupiler 24×25cl',eenheid:'pak'},{id:'d2',naam:'Leffe Blond 24×33cl',eenheid:'pak'},
+    {id:'d3',naam:'Duvel 24×33cl',eenheid:'pak'},{id:'d4',naam:'Hoegaarden 24×25cl',eenheid:'pak'},
+    {id:'d5',naam:'Bacardi Carta Blanca 1L',eenheid:'fles'},{id:'d6',naam:'Absolut Vodka 1L',eenheid:'fles'},
+    {id:'d7',naam:'Chivas Regal 12y 1L',eenheid:'fles'},{id:'d8',naam:'Bombay Sapphire 1L',eenheid:'fles'},
+    {id:'d9',naam:'Martini Rosso 1L',eenheid:'fles'},{id:'d10',naam:'Prosecco 75cl',eenheid:'fles'},
   ],
   tabak: [
-    {id:'t1', naam:'Marlboro Red', eenheid:'sloef'},
-    {id:'t2', naam:'Marlboro Gold', eenheid:'sloef'},
-    {id:'t3', naam:'Winston Classic', eenheid:'sloef'},
-    {id:'t4', naam:'Lucky Strike Original', eenheid:'sloef'},
-    {id:'t5', naam:'Camel Blue', eenheid:'sloef'},
-    {id:'t6', naam:'Philip Morris', eenheid:'sloef'},
-    {id:'t7', naam:'Drum 50g', eenheid:'zak'},
-    {id:'t8', naam:'Amber Leaf 50g', eenheid:'zak'},
+    {id:'t1',naam:'Marlboro Red',eenheid:'sloef'},{id:'t2',naam:'Marlboro Gold',eenheid:'sloef'},
+    {id:'t3',naam:'Winston Classic',eenheid:'sloef'},{id:'t4',naam:'Lucky Strike Original',eenheid:'sloef'},
+    {id:'t5',naam:'Camel Blue',eenheid:'sloef'},{id:'t6',naam:'Philip Morris',eenheid:'sloef'},
+    {id:'t7',naam:'Drum 50g',eenheid:'zak'},{id:'t8',naam:'Amber Leaf 50g',eenheid:'zak'},
   ]
 };
 
-let trips = [];
-let orders = [];
-let catalog = JSON.parse(JSON.stringify(defaultCatalog));
-let cart = {};
-let customRows = { drank: [], tabak: [] };
+let trips=[], orders=[], catalog=JSON.parse(JSON.stringify(defaultCatalog));
+let cart={}, customRows={drank:[],tabak:[]};
+let overzichtNaam='';
+let editOrderKey=null, editCart={}, editCustomRows={drank:[],tabak:[]};
 
-const ADMIN_PW = 'luxemburg2026';
-const ADMIN_KEY = 'lux_admin_unlocked';
+const ADMIN_PW='luxemburg2026', ADMIN_KEY='lux_admin_unlocked';
 
-// ── Firebase laden ────────────────────────────────────────────────
+// ── Firebase ──────────────────────────────────────────────────────
 async function loadData() {
-  document.getElementById('header-sub').textContent = 'Laden...';
   try {
-    const [tripsSnap, ordersSnap, catalogSnap] = await Promise.all([
-      get(ref(db, 'trips')),
-      get(ref(db, 'orders')),
-      get(ref(db, 'catalog'))
-    ]);
-    trips  = tripsSnap.exists()   ? Object.entries(tripsSnap.val()).map(([k,v])=>({...v,_key:k}))   : [];
-    orders = ordersSnap.exists()  ? Object.entries(ordersSnap.val()).map(([k,v])=>({...v,_key:k}))  : [];
-    catalog = catalogSnap.exists() ? catalogSnap.val() : JSON.parse(JSON.stringify(defaultCatalog));
-  } catch(e) {
-    console.error(e);
-  }
+    const [t,o,c] = await Promise.all([get(ref(db,'trips')),get(ref(db,'orders')),get(ref(db,'catalog'))]);
+    trips  = t.exists() ? Object.entries(t.val()).map(([k,v])=>({...v,_key:k})) : [];
+    orders = o.exists() ? Object.entries(o.val()).map(([k,v])=>({...v,_key:k})) : [];
+    catalog = c.exists() ? c.val() : JSON.parse(JSON.stringify(defaultCatalog));
+  } catch(e) { console.error(e); }
   document.getElementById('header-sub').textContent = 'Selecteer een trip om te bestellen';
   renderAll();
 }
 
-// Live updates
-onValue(ref(db, 'trips'), snap => {
+onValue(ref(db,'trips'), snap => {
   trips = snap.exists() ? Object.entries(snap.val()).map(([k,v])=>({...v,_key:k})) : [];
   renderTripSelects(); renderBeheerTrips(); renderOverzicht();
 });
-onValue(ref(db, 'orders'), snap => {
+onValue(ref(db,'orders'), snap => {
   orders = snap.exists() ? Object.entries(snap.val()).map(([k,v])=>({...v,_key:k})) : [];
   renderOverzicht();
 });
-onValue(ref(db, 'catalog'), snap => {
-  if (snap.exists()) { catalog = snap.val(); renderBestelLists(); renderCatalogLists(); }
+onValue(ref(db,'catalog'), snap => {
+  if(snap.exists()){ catalog=snap.val(); renderBestelLists(); renderCatalogLists(); }
 });
 
-// ── Opslaan ───────────────────────────────────────────────────────
-async function saveCatalog() { await set(ref(db, 'catalog'), catalog); }
+async function saveCatalog() { await set(ref(db,'catalog'),catalog); }
 
 // ── Admin ─────────────────────────────────────────────────────────
-function isAdminUnlocked() { return sessionStorage.getItem(ADMIN_KEY) === '1'; }
+function isAdminUnlocked() { return sessionStorage.getItem(ADMIN_KEY)==='1'; }
 
 window.checkAdminPw = function() {
-  const val = document.getElementById('admin-pw-input').value;
-  const errEl = document.getElementById('pw-error');
-  if (val === ADMIN_PW) {
-    sessionStorage.setItem(ADMIN_KEY, '1');
-    document.getElementById('admin-pw-input').value = '';
-    errEl.style.display = 'none';
-    showAdminContent();
-  } else {
-    errEl.style.display = 'block';
-    document.getElementById('admin-pw-input').value = '';
-    document.getElementById('admin-pw-input').focus();
-  }
+  const val=document.getElementById('admin-pw-input').value;
+  const errEl=document.getElementById('pw-error');
+  if(val===ADMIN_PW){ sessionStorage.setItem(ADMIN_KEY,'1'); document.getElementById('admin-pw-input').value=''; errEl.style.display='none'; showAdminContent(); }
+  else { errEl.style.display='block'; document.getElementById('admin-pw-input').value=''; document.getElementById('admin-pw-input').focus(); }
 };
 
 function showAdminContent() {
-  document.getElementById('beheer-lock').style.display = 'none';
-  document.getElementById('beheer-content').style.display = 'block';
-  document.getElementById('tab-beheer-btn').style.display = '';
+  document.getElementById('beheer-lock').style.display='none';
+  document.getElementById('beheer-content').style.display='block';
+  document.getElementById('tab-beheer-btn').style.display='';
   renderBeheerTrips(); renderCatalogLists();
 }
 
 window.adminLogout = function() {
   sessionStorage.removeItem(ADMIN_KEY);
-  document.getElementById('beheer-lock').style.display = 'block';
-  document.getElementById('beheer-content').style.display = 'none';
-  document.getElementById('tab-beheer-btn').style.display = 'none';
+  document.getElementById('beheer-lock').style.display='block';
+  document.getElementById('beheer-content').style.display='none';
+  document.getElementById('tab-beheer-btn').style.display='none';
   showTab('bestellen');
 };
 
 // ── Tabs ──────────────────────────────────────────────────────────
 window.showTab = function(name) {
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelector(`[onclick="showTab('${name}')"]`).classList.add('active');
-  document.getElementById('page-' + name).classList.add('active');
-  if (name === 'overzicht') renderOverzicht();
-  if (name === 'beheer' && isAdminUnlocked()) showAdminContent();
+  document.getElementById('page-'+name).classList.add('active');
+  if(name==='overzicht') renderOverzicht();
+  if(name==='beheer'&&isAdminUnlocked()) showAdminContent();
 };
 
 // ── Trips ─────────────────────────────────────────────────────────
-function fmtDate(iso) {
-  if (!iso) return '';
-  const [y,m,d] = iso.split('-');
-  return `${d}/${m}/${y}`;
-}
+function fmtDate(iso){ if(!iso)return''; const[y,m,d]=iso.split('-'); return`${d}/${m}/${y}`; }
 
 function renderTripSelects() {
-  ['trip-select','overzicht-trip-select'].forEach(id => {
-    const sel = document.getElementById(id);
-    if (!sel) return;
-    sel.innerHTML = trips.length === 0
-      ? '<option value="">— nog geen trips —</option>'
-      : trips.map(t => `<option value="${t.id}">${t.naam}${t.datum?' · '+fmtDate(t.datum):''}</option>`).join('');
+  ['trip-select','overzicht-trip-select'].forEach(id=>{
+    const sel=document.getElementById(id); if(!sel)return;
+    sel.innerHTML=trips.length===0?'<option value="">— nog geen trips —</option>':trips.map(t=>`<option value="${t.id}">${t.naam}${t.datum?' · '+fmtDate(t.datum):''}</option>`).join('');
   });
 }
 
 function onTripSelect() {
-  const sel = document.getElementById('trip-select');
-  const trip = trips.find(t => t.id === sel.value);
-  const infoEl = document.getElementById('trip-info');
-  const closedEl = document.getElementById('trip-closed');
-  const formEl = document.getElementById('order-form');
-  const headerSub = document.getElementById('header-sub');
+  const sel=document.getElementById('trip-select');
+  const trip=trips.find(t=>t.id===sel.value);
+  const infoEl=document.getElementById('trip-info'), closedEl=document.getElementById('trip-closed'), formEl=document.getElementById('order-form');
   infoEl.classList.remove('show'); closedEl.classList.remove('show');
-  if (!trip) { formEl.style.display = 'none'; headerSub.textContent = 'Selecteer een trip'; return; }
-  headerSub.textContent = trip.naam + (trip.datum ? ' · ' + fmtDate(trip.datum) : '');
-  if (trip.notitie) { infoEl.textContent = '📝 ' + trip.notitie; infoEl.classList.add('show'); }
-  if (trip.status !== 'open') {
-    closedEl.textContent = '🔒 Deze trip is gesloten.';
-    closedEl.classList.add('show');
-    formEl.style.display = 'none';
-    return;
-  }
-  formEl.style.display = 'block';
-  cart = {}; customRows = { drank: [], tabak: [] };
+  if(!trip){ formEl.style.display='none'; document.getElementById('header-sub').textContent='Selecteer een trip'; return; }
+  document.getElementById('header-sub').textContent=trip.naam+(trip.datum?' · '+fmtDate(trip.datum):'');
+  if(trip.notitie){ infoEl.textContent='📝 '+trip.notitie; infoEl.classList.add('show'); }
+  if(trip.status!=='open'){ closedEl.textContent='🔒 Deze trip is gesloten. Geen nieuwe bestellingen mogelijk.'; closedEl.classList.add('show'); formEl.style.display='none'; return; }
+  formEl.style.display='block'; cart={}; customRows={drank:[],tabak:[]};
   renderBestelLists(); renderCustomSections();
 }
-window.onTripSelect = onTripSelect;
+window.onTripSelect=onTripSelect;
 
 window.createTrip = async function() {
-  const naam = document.getElementById('trip-naam').value.trim();
-  const datum = document.getElementById('trip-datum').value;
-  const notitie = document.getElementById('trip-notitie').value.trim();
-  if (!naam) return;
-  const id = 'trip' + Date.now();
-  await set(ref(db, 'trips/' + id), { id, naam, datum, notitie, status: 'open' });
-  document.getElementById('trip-naam').value = '';
-  document.getElementById('trip-datum').value = '';
-  document.getElementById('trip-notitie').value = '';
+  const naam=document.getElementById('trip-naam').value.trim();
+  const datum=document.getElementById('trip-datum').value;
+  const notitie=document.getElementById('trip-notitie').value.trim();
+  if(!naam)return;
+  const id='trip'+Date.now();
+  await set(ref(db,'trips/'+id),{id,naam,datum,notitie,status:'open'});
+  document.getElementById('trip-naam').value=''; document.getElementById('trip-datum').value=''; document.getElementById('trip-notitie').value='';
 };
 
-window.toggleTrip = async function(id, key) {
-  const t = trips.find(x => x.id === id);
-  if (t) await set(ref(db, 'trips/' + key + '/status'), t.status === 'open' ? 'closed' : 'open');
+window.toggleTrip = async function(id,key) {
+  const t=trips.find(x=>x.id===id);
+  if(t) await set(ref(db,'trips/'+key+'/status'),t.status==='open'?'closed':'open');
 };
 
-window.deleteTrip = async function(id, key) {
-  if (!confirm('Trip verwijderen?')) return;
-  await remove(ref(db, 'trips/' + key));
-  const toDelete = orders.filter(o => o.tripId === id);
-  for (const o of toDelete) await remove(ref(db, 'orders/' + o._key));
+window.deleteTrip = async function(id,key) {
+  if(!confirm('Trip verwijderen?'))return;
+  await remove(ref(db,'trips/'+key));
+  for(const o of orders.filter(o=>o.tripId===id)) await remove(ref(db,'orders/'+o._key));
 };
 
 // ── Bestellen ─────────────────────────────────────────────────────
 function renderBestelLists() {
-  ['drank','tabak'].forEach(cat => {
-    const el = document.getElementById(cat + '-list');
-    if (!el) return;
-    const items = catalog[cat] || [];
-    if (items.length === 0) { el.innerHTML = '<p style="font-size:13px;color:var(--text-faint)">Geen producten.</p>'; return; }
-    el.innerHTML = items.map(p => `
+  ['drank','tabak'].forEach(cat=>{
+    const el=document.getElementById(cat+'-list'); if(!el)return;
+    const items=catalog[cat]||[];
+    if(items.length===0){el.innerHTML='<p style="font-size:13px;color:var(--text-faint)">Geen producten.</p>';return;}
+    el.innerHTML=items.map(p=>`
       <div class="product-row">
         <div class="pname">${p.naam}<br><span class="punit">${p.eenheid}</span></div>
         <div class="qty-ctrl">
@@ -418,99 +412,97 @@ function renderBestelLists() {
   });
 }
 
-window.changeQty = function(id, delta) {
-  cart[id] = Math.max(0, (cart[id]||0) + delta);
-  const el = document.getElementById('qty-' + id);
-  if (el) el.textContent = cart[id];
+window.changeQty = function(id,delta) {
+  cart[id]=Math.max(0,(cart[id]||0)+delta);
+  const el=document.getElementById('qty-'+id); if(el)el.textContent=cart[id];
 };
 
 window.addCustomRow = function(cat) {
-  const rid = 'cr_' + Date.now();
-  customRows[cat].push(rid);
-  renderCustomSection(cat);
+  const rid='cr_'+Date.now(); customRows[cat].push(rid); renderCustomSection(cat);
 };
-
-window.removeCustomRow = function(cat, rid) {
-  customRows[cat] = customRows[cat].filter(r => r !== rid);
-  renderCustomSection(cat);
+window.removeCustomRow = function(cat,rid) {
+  customRows[cat]=customRows[cat].filter(r=>r!==rid); renderCustomSection(cat);
 };
 
 function renderCustomSection(cat) {
-  const el = document.getElementById(cat + '-custom');
-  if (!el) return;
-  if (customRows[cat].length === 0) { el.innerHTML = ''; return; }
-  el.innerHTML = customRows[cat].map(rid => `
-    <div class="custom-row" id="${rid}">
+  const el=document.getElementById(cat+'-custom'); if(!el)return;
+  if(customRows[cat].length===0){el.innerHTML='';return;}
+  el.innerHTML=customRows[cat].map(rid=>`
+    <div class="custom-row">
       <input type="text" placeholder="Product omschrijving" id="${rid}_naam" style="flex:1;min-width:0" />
       <input type="text" class="qty-input" placeholder="Aantal" id="${rid}_qty" style="width:70px;flex:0 0 70px;text-align:center" />
       <button class="btn sm danger" onclick="removeCustomRow('${cat}','${rid}')">✕</button>
     </div>`).join('');
 }
+function renderCustomSections(){ renderCustomSection('drank'); renderCustomSection('tabak'); }
 
-function renderCustomSections() { renderCustomSection('drank'); renderCustomSection('tabak'); }
-
-function getCustomItems(cat) {
-  return customRows[cat].map(rid => {
-    const naam = (document.getElementById(rid+'_naam')?.value||'').trim();
-    const qty = parseInt(document.getElementById(rid+'_qty')?.value||'0')||0;
-    if (!naam && qty===0) return null;
-    return { naam: naam||'(geen naam)', qty, cat, custom:true };
+function getCustomItems(cat,prefix='') {
+  return (customRows[cat]||[]).map(rid=>{
+    const naam=(document.getElementById(prefix+rid+'_naam')?.value||'').trim();
+    const qty=parseInt(document.getElementById(prefix+rid+'_qty')?.value||'0')||0;
+    if(!naam&&qty===0)return null;
+    return{naam:naam||'(geen naam)',qty,cat,custom:true};
   }).filter(Boolean);
 }
 
 window.submitOrder = async function() {
-  const naam = document.getElementById('naam').value.trim();
-  const alertEl = document.getElementById('order-alert');
-  if (!naam) { showAlert(alertEl,'Vul eerst jouw naam in.','info'); return; }
-  const allProds = [...(catalog.drank||[]),...(catalog.tabak||[])];
-  const catalogItems = allProds.filter(p=>(cart[p.id]||0)>0).map(p=>({
-    naam:p.naam, qty:cart[p.id],
-    cat:(catalog.drank||[]).find(d=>d.id===p.id)?'drank':'tabak',
-    eenheid:p.eenheid, custom:false
-  }));
-  const customItems = [...getCustomItems('drank'),...getCustomItems('tabak')];
-  const items = [...catalogItems,...customItems];
-  if (items.length===0) { showAlert(alertEl,'Voeg minstens één product toe.','info'); return; }
-  const tripId = document.getElementById('trip-select').value;
-  const order = { id:'o'+Date.now(), tripId, naam, items, ts: new Date().toISOString() };
-  await push(ref(db,'orders'), order);
+  const naam=document.getElementById('naam').value.trim();
+  const alertEl=document.getElementById('order-alert');
+  if(!naam){showAlert(alertEl,'Vul eerst jouw naam in.','info');return;}
+  const trip=trips.find(t=>t.id===document.getElementById('trip-select').value);
+  if(!trip||trip.status!=='open'){showAlert(alertEl,'Deze trip is gesloten.','warning');return;}
+  const allProds=[...(catalog.drank||[]),...(catalog.tabak||[])];
+  const catalogItems=allProds.filter(p=>(cart[p.id]||0)>0).map(p=>({naam:p.naam,qty:cart[p.id],cat:(catalog.drank||[]).find(d=>d.id===p.id)?'drank':'tabak',eenheid:p.eenheid,custom:false}));
+  const customItems=[...getCustomItems('drank'),...getCustomItems('tabak')];
+  const items=[...catalogItems,...customItems];
+  if(items.length===0){showAlert(alertEl,'Voeg minstens één product toe.','info');return;}
+  const order={id:'o'+Date.now(),tripId:trip.id,naam,items,ts:new Date().toISOString()};
+  await push(ref(db,'orders'),order);
   cart={}; customRows={drank:[],tabak:[]};
   renderBestelLists(); renderCustomSections();
   document.getElementById('naam').value='';
-  showAlert(alertEl,`✅ Bestelling van ${naam} ingediend! (${items.length} product${items.length!==1?'en':''})`, 'success');
+  showAlert(alertEl,`✅ Bestelling van ${naam} ingediend!`,'success');
   window.scrollTo({top:0,behavior:'smooth'});
+};
+
+// ── Overzicht naam ────────────────────────────────────────────────
+window.setOverzichtNaam = function() {
+  const val=document.getElementById('overzicht-naam').value.trim();
+  overzichtNaam=val;
+  const infoEl=document.getElementById('overzicht-naam-info');
+  if(val){ infoEl.textContent=`Je ziet nu "Bewerken" en "Verwijderen" bij de bestellingen van ${val}.`; infoEl.style.display='block'; }
+  else { infoEl.style.display='none'; }
+  renderOverzicht();
 };
 
 // ── Overzicht ─────────────────────────────────────────────────────
 function renderOverzicht() {
-  const sel = document.getElementById('overzicht-trip-select');
-  const tripId = sel?.value;
-  const trip = trips.find(t=>t.id===tripId)||trips[0];
-  const filtered = trip ? orders.filter(o=>o.tripId===trip.id) : [];
-  const totalItems = filtered.reduce((s,o)=>s+o.items.reduce((ss,i)=>ss+i.qty,0),0);
-  document.getElementById('stats-grid').innerHTML = `
+  const sel=document.getElementById('overzicht-trip-select');
+  const trip=trips.find(t=>t.id===sel?.value)||trips[0];
+  const filtered=trip?orders.filter(o=>o.tripId===trip.id):[];
+  const totalItems=filtered.reduce((s,o)=>s+o.items.reduce((ss,i)=>ss+i.qty,0),0);
+  document.getElementById('stats-grid').innerHTML=`
     <div class="stat-card"><div class="stat-val">${filtered.length}</div><div class="stat-lbl">Bestellingen</div></div>
     <div class="stat-card"><div class="stat-val">${totalItems}</div><div class="stat-lbl">Producten totaal</div></div>
     <div class="stat-card"><div class="stat-val">${trip?(trip.status==='open'?'Open':'Gesloten'):'—'}</div><div class="stat-lbl">Status trip</div></div>`;
-  const list = document.getElementById('orders-list');
-  if (filtered.length===0) {
-    list.innerHTML='<div class="empty-state"><div class="icon">📭</div><p>Nog geen bestellingen voor deze trip.</p></div>';
-    document.getElementById('totaal-summary').innerHTML='';
-    return;
-  }
-  list.innerHTML = filtered.map(o=>`
-    <div class="order-card">
+  const list=document.getElementById('orders-list');
+  if(filtered.length===0){ list.innerHTML='<div class="empty-state"><div class="icon">📭</div><p>Nog geen bestellingen voor deze trip.</p></div>'; document.getElementById('totaal-summary').innerHTML=''; return; }
+  list.innerHTML=filtered.map(o=>{
+    const isOwn=overzichtNaam&&o.naam.toLowerCase()===overzichtNaam.toLowerCase();
+    return`<div class="order-card${isOwn?' mine':''}">
       <div class="order-header">
-        <span class="order-person">👤 ${o.naam}</span>
+        <span class="order-person">👤 ${o.naam}${isOwn?' <span style="font-size:11px;color:var(--accent)">(jij)</span>':''}</span>
         <span class="order-date">${new Date(o.ts).toLocaleDateString('nl-BE',{day:'2-digit',month:'short',year:'numeric'})}</span>
       </div>
       ${o.items.map(i=>`<div class="order-item"><span><span class="cat-badge cat-${i.cat}">${i.cat}</span> ${i.naam}${i.custom?' <em style="font-size:11px;color:var(--text-faint)">(eigen)</em>':''}</span><span class="qty-tag">${i.qty}×</span></div>`).join('')}
-    </div>`).join('');
+      ${isOwn?`<div class="order-actions">
+        <button class="btn sm primary" onclick="openEdit('${o._key}')">✏️ Bewerken</button>
+        <button class="btn sm danger" onclick="deleteOrder('${o._key}')">🗑 Verwijderen</button>
+      </div>`:''}
+    </div>`;
+  }).join('');
   const totals={};
-  filtered.forEach(o=>o.items.forEach(i=>{
-    if(!totals[i.naam]) totals[i.naam]={qty:0,cat:i.cat};
-    totals[i.naam].qty+=i.qty;
-  }));
+  filtered.forEach(o=>o.items.forEach(i=>{ if(!totals[i.naam])totals[i.naam]={qty:0,cat:i.cat}; totals[i.naam].qty+=i.qty; }));
   document.getElementById('totaal-summary').innerHTML=`
     <div class="card"><div class="card-title">🛍️ Boodschappenlijst</div>
     <ul class="summary-list">${Object.entries(totals).sort((a,b)=>b[1].qty-a[1].qty).map(([naam,v])=>`
@@ -518,19 +510,104 @@ function renderOverzicht() {
     </ul></div>`;
 }
 
+// ── Verwijderen ───────────────────────────────────────────────────
+window.deleteOrder = async function(key) {
+  if(!confirm('Bestelling verwijderen?'))return;
+  await remove(ref(db,'orders/'+key));
+};
+
+// ── Bewerken ──────────────────────────────────────────────────────
+window.openEdit = function(key) {
+  const order=orders.find(o=>o._key===key); if(!order)return;
+  editOrderKey=key; editCart={}; editCustomRows={drank:[],tabak:[]};
+  order.items.forEach(i=>{ if(!i.custom)editCart[i.id||i.naam]=i.qty; });
+  renderEditLists();
+  // vul custom rows
+  order.items.filter(i=>i.custom).forEach(i=>{
+    const rid='ecr_'+Date.now()+'_'+Math.random().toString(36).slice(2,5);
+    editCustomRows[i.cat].push({rid,naam:i.naam,qty:i.qty});
+  });
+  renderEditCustomSections();
+  document.getElementById('edit-overlay').style.display='block';
+  document.body.style.overflow='hidden';
+};
+
+window.closeEdit = function() {
+  document.getElementById('edit-overlay').style.display='none';
+  document.body.style.overflow='';
+  editOrderKey=null;
+};
+
+function renderEditLists() {
+  ['drank','tabak'].forEach(cat=>{
+    const el=document.getElementById('edit-'+cat+'-list'); if(!el)return;
+    const items=catalog[cat]||[];
+    if(items.length===0){el.innerHTML='';return;}
+    if(cat==='drank') el.innerHTML='<div class="card-title">🍺 Drank</div>';
+    el.innerHTML=(cat==='drank'?'<div class="card-title">🍺 Drank</div>':'')+items.map(p=>`
+      <div class="product-row">
+        <div class="pname">${p.naam}<br><span class="punit">${p.eenheid}</span></div>
+        <div class="qty-ctrl">
+          <button class="qty-btn" onclick="changeEditQty('${p.id}',-1)">−</button>
+          <span class="qty-val" id="eqty-${p.id}">${editCart[p.id]||0}</span>
+          <button class="qty-btn" onclick="changeEditQty('${p.id}',1)">+</button>
+        </div>
+      </div>`).join('');
+  });
+}
+
+window.changeEditQty = function(id,delta) {
+  editCart[id]=Math.max(0,(editCart[id]||0)+delta);
+  const el=document.getElementById('eqty-'+id); if(el)el.textContent=editCart[id];
+};
+
+window.addEditCustomRow = function(cat) {
+  editCustomRows[cat].push({rid:'ecr_'+Date.now(),naam:'',qty:0});
+  renderEditCustomSections();
+};
+window.removeEditCustomRow = function(cat,rid) {
+  editCustomRows[cat]=editCustomRows[cat].filter(r=>r.rid!==rid);
+  renderEditCustomSections();
+};
+
+function renderEditCustomSections() {
+  ['drank','tabak'].forEach(cat=>{
+    const el=document.getElementById('edit-'+cat+'-custom'); if(!el)return;
+    if(editCustomRows[cat].length===0){el.innerHTML='';return;}
+    el.innerHTML=editCustomRows[cat].map(r=>`
+      <div class="custom-row">
+        <input type="text" placeholder="Product omschrijving" id="${r.rid}_naam" value="${r.naam}" style="flex:1;min-width:0" />
+        <input type="text" class="qty-input" placeholder="Aantal" id="${r.rid}_qty" value="${r.qty||''}" style="width:70px;flex:0 0 70px;text-align:center" />
+        <button class="btn sm danger" onclick="removeEditCustomRow('${cat}','${r.rid}')">✕</button>
+      </div>`).join('');
+  });
+}
+
+window.saveEdit = async function() {
+  if(!editOrderKey)return;
+  const allProds=[...(catalog.drank||[]),...(catalog.tabak||[])];
+  const catalogItems=allProds.filter(p=>(editCart[p.id]||0)>0).map(p=>({naam:p.naam,qty:editCart[p.id],cat:(catalog.drank||[]).find(d=>d.id===p.id)?'drank':'tabak',eenheid:p.eenheid,custom:false}));
+  const customItems=[...editCustomRows.drank,...editCustomRows.tabak].map(r=>{
+    const naam=(document.getElementById(r.rid+'_naam')?.value||'').trim();
+    const qty=parseInt(document.getElementById(r.rid+'_qty')?.value||'0')||0;
+    if(!naam&&qty===0)return null;
+    const cat=editCustomRows.drank.find(x=>x.rid===r.rid)?'drank':'tabak';
+    return{naam:naam||'(geen naam)',qty,cat,custom:true};
+  }).filter(Boolean);
+  const items=[...catalogItems,...customItems];
+  if(items.length===0){alert('Voeg minstens één product toe.');return;}
+  await update(ref(db,'orders/'+editOrderKey),{items,ts:new Date().toISOString()});
+  closeEdit();
+};
+
 // ── Beheer trips ──────────────────────────────────────────────────
 function renderBeheerTrips() {
-  const el = document.getElementById('trip-list-beheer');
-  if (!el) return;
-  if (trips.length===0) { el.innerHTML='<p style="font-size:13px;color:var(--text-faint)">Nog geen trips.</p>'; return; }
-  el.innerHTML = trips.map(t=>{
-    const cnt = orders.filter(o=>o.tripId===t.id).length;
-    return `<div class="trip-row">
-      <div class="trip-info">
-        <div class="trip-name">${t.naam}</div>
-        <div class="trip-meta">${t.datum?fmtDate(t.datum)+' · ':''}${cnt} bestelling${cnt!==1?'en':''}</div>
-        ${t.notitie?`<div class="trip-meta">📝 ${t.notitie}</div>`:''}
-      </div>
+  const el=document.getElementById('trip-list-beheer'); if(!el)return;
+  if(trips.length===0){el.innerHTML='<p style="font-size:13px;color:var(--text-faint)">Nog geen trips.</p>';return;}
+  el.innerHTML=trips.map(t=>{
+    const cnt=orders.filter(o=>o.tripId===t.id).length;
+    return`<div class="trip-row">
+      <div class="trip-info"><div class="trip-name">${t.naam}</div><div class="trip-meta">${t.datum?fmtDate(t.datum)+' · ':''}${cnt} bestelling${cnt!==1?'en':''}</div>${t.notitie?`<div class="trip-meta">📝 ${t.notitie}</div>`:''}</div>
       <span class="badge ${t.status==='open'?'open':'closed'}">${t.status==='open'?'Open':'Gesloten'}</span>
       <button class="btn sm" onclick="toggleTrip('${t.id}','${t._key}')">${t.status==='open'?'Sluiten':'Heropenen'}</button>
       <button class="btn sm danger" onclick="deleteTrip('${t.id}','${t._key}')">🗑</button>
@@ -540,26 +617,23 @@ function renderBeheerTrips() {
 
 // ── Catalogus ─────────────────────────────────────────────────────
 window.addProduct = async function() {
-  const naam = document.getElementById('prod-naam').value.trim();
-  const eenheid = document.getElementById('prod-eenheid').value.trim()||'stuk';
-  const cat = document.getElementById('prod-cat').value;
-  if (!naam) return;
-  if (!catalog[cat]) catalog[cat]=[];
-  catalog[cat].push({id:'p'+Date.now(), naam, eenheid});
+  const naam=document.getElementById('prod-naam').value.trim();
+  const eenheid=document.getElementById('prod-eenheid').value.trim()||'stuk';
+  const cat=document.getElementById('prod-cat').value;
+  if(!naam)return;
+  if(!catalog[cat])catalog[cat]=[];
+  catalog[cat].push({id:'p'+Date.now(),naam,eenheid});
   await saveCatalog();
-  document.getElementById('prod-naam').value='';
-  document.getElementById('prod-eenheid').value='';
+  document.getElementById('prod-naam').value=''; document.getElementById('prod-eenheid').value='';
 };
 
-window.deleteProduct = async function(cat, id) {
-  catalog[cat]=(catalog[cat]||[]).filter(p=>p.id!==id);
-  await saveCatalog();
+window.deleteProduct = async function(cat,id) {
+  catalog[cat]=(catalog[cat]||[]).filter(p=>p.id!==id); await saveCatalog();
 };
 
 function renderCatalogLists() {
   ['drank','tabak'].forEach(cat=>{
-    const el=document.getElementById('cat-'+cat+'-list');
-    if(!el) return;
+    const el=document.getElementById('cat-'+cat+'-list'); if(!el)return;
     const items=catalog[cat]||[];
     if(items.length===0){el.innerHTML='<p style="font-size:12px;color:var(--text-faint)">Leeg.</p>';return;}
     el.innerHTML=items.map(p=>`
@@ -571,10 +645,9 @@ function renderCatalogLists() {
 }
 
 // ── Helpers ───────────────────────────────────────────────────────
-function showAlert(el, msg, type) {
+function showAlert(el,msg,type) {
   el.className='alert '+type+' show'; el.textContent=msg;
-  clearTimeout(el._timer);
-  el._timer=setTimeout(()=>el.classList.remove('show'),5000);
+  clearTimeout(el._timer); el._timer=setTimeout(()=>el.classList.remove('show'),5000);
 }
 
 function renderAll() {
@@ -582,14 +655,12 @@ function renderAll() {
   renderCustomSections(); renderCatalogLists(); renderBeheerTrips(); renderOverzicht();
 }
 
-// ── Init ──────────────────────────────────────────────────────────
 await loadData();
 
-if (window.location.search.includes('admin')) {
-  sessionStorage.setItem(ADMIN_KEY, '1');
-  document.getElementById('tab-beheer-btn').style.display = '';
-  showTab('beheer');
-  showAdminContent();
+if(window.location.search.includes('admin')) {
+  sessionStorage.setItem(ADMIN_KEY,'1');
+  document.getElementById('tab-beheer-btn').style.display='';
+  showTab('beheer'); showAdminContent();
 }
 </script>
 </body>
