@@ -6,269 +6,90 @@
 <title>Luxemburg Bestelling</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
   :root {
-    --bg: #f7f6f2;
-    --surface: #ffffff;
-    --border: #e2e0d8;
-    --border-strong: #c8c5bb;
-    --text: #1a1917;
-    --text-muted: #6b6960;
-    --text-faint: #a09d95;
-    --accent: #2d6a4f;
-    --accent-light: #e8f5ee;
-    --accent-text: #1b4332;
-    --amber: #b45309;
-    --amber-light: #fef3c7;
-    --amber-text: #78350f;
-    --red: #dc2626;
-    --red-light: #fee2e2;
-    --radius: 10px;
-    --radius-sm: 6px;
+    --bg: #f7f6f2; --surface: #ffffff; --border: #e2e0d8; --border-strong: #c8c5bb;
+    --text: #1a1917; --text-muted: #6b6960; --text-faint: #a09d95;
+    --accent: #2d6a4f; --accent-light: #e8f5ee; --accent-text: #1b4332;
+    --amber: #b45309; --amber-light: #fef3c7; --amber-text: #78350f;
+    --red: #dc2626; --red-light: #fee2e2; --radius: 10px; --radius-sm: 6px;
     --shadow: 0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04);
   }
-
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    font-size: 15px;
-    line-height: 1.5;
-  }
-
-  header {
-    background: var(--accent);
-    color: #fff;
-    padding: 1rem 1.25rem;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-  }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; font-size: 15px; line-height: 1.5; }
+  header { background: var(--accent); color: #fff; padding: 1rem 1.25rem; display: flex; align-items: center; gap: 10px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
   header h1 { font-size: 17px; font-weight: 600; }
   header .sub { font-size: 12px; opacity: 0.75; margin-top: 1px; }
-
-  .tab-bar {
-    display: flex;
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    position: sticky;
-    top: 57px;
-    z-index: 90;
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
+  .tab-bar { display: flex; background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 57px; z-index: 90; overflow-x: auto; scrollbar-width: none; }
   .tab-bar::-webkit-scrollbar { display: none; }
-  .tab-btn {
-    flex: 1;
-    min-width: 90px;
-    padding: 12px 8px;
-    border: none;
-    background: transparent;
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text-muted);
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    transition: color 0.15s, border-color 0.15s;
-    white-space: nowrap;
-  }
-  .tab-btn.active {
-    color: var(--accent);
-    border-bottom-color: var(--accent);
-  }
-
+  .tab-btn { flex: 1; min-width: 90px; padding: 12px 8px; border: none; background: transparent; font-size: 13px; font-weight: 500; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; transition: color 0.15s, border-color 0.15s; white-space: nowrap; }
+  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
   .page { display: none; padding: 1rem; max-width: 640px; margin: 0 auto; }
   .page.active { display: block; }
-
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 1rem;
-    margin-bottom: 1rem;
-    box-shadow: var(--shadow);
-  }
-
-  .card-title {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: .75rem;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; margin-bottom: 1rem; box-shadow: var(--shadow); }
+  .card-title { font-size: 14px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: .75rem; display: flex; align-items: center; gap: 6px; }
   label { font-size: 13px; color: var(--text-muted); display: block; margin-bottom: 4px; }
   .field { margin-bottom: .75rem; }
   .field:last-child { margin-bottom: 0; }
-
-  input[type=text], input[type=date], select, textarea {
-    width: 100%;
-    padding: 9px 12px;
-    border: 1px solid var(--border-strong);
-    border-radius: var(--radius-sm);
-    font-size: 14px;
-    background: var(--bg);
-    color: var(--text);
-    outline: none;
-    transition: border-color 0.15s;
-    font-family: inherit;
-  }
-  input[type=text]:focus, input[type=date]:focus, select:focus, textarea:focus {
-    border-color: var(--accent);
-    background: #fff;
-  }
+  input[type=text], input[type=date], select, textarea { width: 100%; padding: 9px 12px; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); font-size: 14px; background: var(--bg); color: var(--text); outline: none; transition: border-color 0.15s; font-family: inherit; }
+  input[type=text]:focus, input[type=date]:focus, select:focus, textarea:focus { border-color: var(--accent); background: #fff; }
   textarea { resize: vertical; min-height: 60px; }
-
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 9px 16px;
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--border-strong);
-    background: var(--surface);
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    color: var(--text);
-    transition: background 0.1s, transform 0.08s;
-    font-family: inherit;
-  }
+  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 9px 16px; border-radius: var(--radius-sm); border: 1px solid var(--border-strong); background: var(--surface); font-size: 14px; font-weight: 500; cursor: pointer; color: var(--text); transition: background 0.1s, transform 0.08s; font-family: inherit; }
   .btn:hover { background: var(--bg); }
   .btn:active { transform: scale(0.97); }
   .btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
   .btn.primary:hover { background: var(--accent-text); }
   .btn.danger { background: var(--red-light); color: var(--red); border-color: #fca5a5; }
   .btn.sm { padding: 5px 10px; font-size: 12px; }
-
   .btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: .75rem; }
-
-  .product-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 0;
-    border-bottom: 1px solid var(--border);
-  }
+  .product-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); }
   .product-row:last-child { border-bottom: none; }
   .product-row .pname { flex: 1; font-size: 14px; }
   .product-row .punit { font-size: 12px; color: var(--text-faint); }
-
   .qty-ctrl { display: flex; align-items: center; gap: 8px; }
-  .qty-btn {
-    width: 30px; height: 30px;
-    border-radius: 50%;
-    border: 1px solid var(--border-strong);
-    background: var(--bg);
-    font-size: 18px;
-    line-height: 1;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    color: var(--text);
-    transition: background 0.1s;
-    font-family: inherit;
-  }
+  .qty-btn { width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--border-strong); background: var(--bg); font-size: 18px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text); transition: background 0.1s; font-family: inherit; }
   .qty-btn:hover { background: var(--accent-light); border-color: var(--accent); color: var(--accent); }
   .qty-val { min-width: 22px; text-align: center; font-size: 15px; font-weight: 600; }
-
-  .cat-badge {
-    display: inline-block;
-    font-size: 11px;
-    font-weight: 600;
-    padding: 2px 7px;
-    border-radius: 20px;
-    text-transform: uppercase;
-    letter-spacing: 0.03em;
-  }
+  .cat-badge { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.03em; }
   .cat-drank { background: var(--accent-light); color: var(--accent-text); }
   .cat-tabak { background: var(--amber-light); color: var(--amber-text); }
-
-  .custom-row {
-    display: flex;
-    gap: 8px;
-    align-items: flex-end;
-    padding: 10px 0;
-    border-bottom: 1px solid var(--border);
-    flex-wrap: wrap;
-  }
+  .custom-row { display: flex; gap: 8px; align-items: flex-end; padding: 10px 0; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
   .custom-row:last-child { border-bottom: none; }
   .custom-row input[type=text] { flex: 1; min-width: 120px; }
-  .custom-row input.qty-input {
-    width: 64px;
-    min-width: 64px;
-    flex: 0 0 64px;
-    text-align: center;
-  }
-
-  .order-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 1rem;
-    margin-bottom: .75rem;
-    box-shadow: var(--shadow);
-  }
+  .custom-row input.qty-input { width: 64px; min-width: 64px; flex: 0 0 64px; text-align: center; }
+  .order-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; margin-bottom: .75rem; box-shadow: var(--shadow); }
   .order-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: .5rem; }
   .order-person { font-weight: 600; font-size: 15px; }
   .order-date { font-size: 12px; color: var(--text-faint); }
   .order-item { display: flex; justify-content: space-between; font-size: 13px; padding: 3px 0; color: var(--text-muted); }
   .order-item .qty-tag { font-weight: 600; color: var(--text); background: var(--bg); padding: 1px 7px; border-radius: 10px; font-size: 12px; }
-  .order-note { font-size: 12px; color: var(--text-faint); margin-top: .5rem; font-style: italic; }
-
   .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 1.25rem; }
   .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: .75rem; text-align: center; box-shadow: var(--shadow); }
   .stat-val { font-size: 22px; font-weight: 700; color: var(--accent); }
   .stat-lbl { font-size: 11px; color: var(--text-faint); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.04em; }
-
   .badge { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 20px; font-weight: 600; }
   .badge.open { background: var(--accent-light); color: var(--accent-text); }
   .badge.closed { background: #f1f0ec; color: var(--text-faint); }
-
   .trip-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); }
   .trip-row:last-child { border-bottom: none; }
   .trip-info { flex: 1; }
   .trip-name { font-weight: 600; font-size: 14px; }
   .trip-meta { font-size: 12px; color: var(--text-faint); margin-top: 2px; }
-
   .empty-state { text-align: center; padding: 2.5rem 1rem; color: var(--text-faint); }
   .empty-state .icon { font-size: 36px; margin-bottom: .5rem; }
   .empty-state p { font-size: 14px; }
-
-  .alert {
-    padding: .75rem 1rem;
-    border-radius: var(--radius-sm);
-    font-size: 14px;
-    margin-bottom: .75rem;
-    display: none;
-  }
+  .alert { padding: .75rem 1rem; border-radius: var(--radius-sm); font-size: 14px; margin-bottom: .75rem; display: none; }
   .alert.show { display: block; }
   .alert.success { background: var(--accent-light); color: var(--accent-text); border: 1px solid #a7f3d0; }
   .alert.info { background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe; }
   .alert.warning { background: var(--amber-light); color: var(--amber-text); border: 1px solid #fde68a; }
-
   .summary-list { list-style: none; }
   .summary-list li { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
   .summary-list li:last-child { border-bottom: none; }
   .summary-qty { font-weight: 700; font-size: 16px; color: var(--accent); min-width: 36px; text-align: right; }
-
   .section-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: .75rem; }
   .section-head h2 { font-size: 16px; font-weight: 600; }
-
   select { appearance: auto; }
-
-  @media (max-width: 420px) {
-    .stat-grid { grid-template-columns: repeat(2, 1fr); }
-    .custom-row { gap: 6px; }
-  }
+  .loading { text-align: center; padding: 2rem; color: var(--text-faint); font-size: 14px; }
+  @media (max-width: 420px) { .stat-grid { grid-template-columns: repeat(2, 1fr); } }
 </style>
 </head>
 <body>
@@ -276,7 +97,7 @@
 <header>
   <div>
     <h1>🇱🇺 Luxemburg Bestelling</h1>
-    <div class="sub" id="header-sub">Selecteer een trip om te bestellen</div>
+    <div class="sub" id="header-sub">Laden...</div>
   </div>
 </header>
 
@@ -286,9 +107,8 @@
   <button class="tab-btn" id="tab-beheer-btn" onclick="showTab('beheer')" style="display:none">⚙️ Beheer</button>
 </div>
 
-<!-- ===== BESTELLEN ===== -->
+<!-- BESTELLEN -->
 <div id="page-bestellen" class="page active">
-
   <div class="card">
     <div class="card-title">Trip</div>
     <div class="field">
@@ -298,7 +118,6 @@
     <div id="trip-info" class="alert info"></div>
     <div id="trip-closed" class="alert warning"></div>
   </div>
-
   <div id="order-form" style="display:none">
     <div class="card">
       <div class="card-title">Jouw naam</div>
@@ -306,7 +125,6 @@
         <input type="text" id="naam" placeholder="bv. Thomas" autocomplete="given-name" />
       </div>
     </div>
-
     <div class="card">
       <div class="card-title">🍺 Drank</div>
       <div id="drank-list"></div>
@@ -316,7 +134,6 @@
         <button class="btn sm" onclick="addCustomRow('drank')" style="margin-top:6px">+ Rij toevoegen</button>
       </div>
     </div>
-
     <div class="card">
       <div class="card-title">🚬 Tabak</div>
       <div id="tabak-list"></div>
@@ -326,32 +143,25 @@
         <button class="btn sm" onclick="addCustomRow('tabak')" style="margin-top:6px">+ Rij toevoegen</button>
       </div>
     </div>
-
     <div id="order-alert" class="alert"></div>
-    <button class="btn primary" onclick="submitOrder()" style="width:100%;justify-content:center;padding:12px">
-      ✅ Bestelling indienen
-    </button>
+    <button class="btn primary" onclick="submitOrder()" style="width:100%;justify-content:center;padding:12px">✅ Bestelling indienen</button>
     <div style="height:1.5rem"></div>
   </div>
 </div>
 
-<!-- ===== OVERZICHT ===== -->
+<!-- OVERZICHT -->
 <div id="page-overzicht" class="page">
   <div class="section-head">
     <h2>Bestellingen</h2>
     <select id="overzicht-trip-select" onchange="renderOverzicht()" style="width:auto;font-size:13px;padding:5px 8px"></select>
   </div>
-
   <div class="stat-grid" id="stats-grid"></div>
-
   <div id="orders-list"></div>
   <div id="totaal-summary"></div>
 </div>
 
-<!-- ===== BEHEER ===== -->
+<!-- BEHEER -->
 <div id="page-beheer" class="page">
-
-  <!-- Wachtwoordscherm -->
   <div id="beheer-lock" class="card" style="margin-top:2rem;max-width:320px;margin-left:auto;margin-right:auto;text-align:center">
     <div style="font-size:32px;margin-bottom:.5rem">🔒</div>
     <div style="font-weight:600;font-size:16px;margin-bottom:.25rem">Admin-toegang</div>
@@ -360,88 +170,59 @@
     <div id="pw-error" style="font-size:12px;color:var(--red);margin-bottom:.5rem;display:none">Fout wachtwoord.</div>
     <button class="btn primary" onclick="checkAdminPw()" style="width:100%;justify-content:center">Inloggen</button>
   </div>
-
-  <!-- Beheercontent (verborgen tot unlock) -->
   <div id="beheer-content" style="display:none">
-  <div style="display:flex;justify-content:flex-end;margin-bottom:.5rem">
-    <button class="btn sm" onclick="adminLogout()">🔓 Uitloggen</button>
-  </div>
-
-  <h2 style="font-size:16px;font-weight:600;margin-bottom:.75rem">Trips</h2>
-
-  <div class="card">
-    <div class="card-title">Nieuwe trip aanmaken</div>
-    <div class="field">
-      <label>Naam</label>
-      <input type="text" id="trip-naam" placeholder="bv. Luxemburg juni 2026" />
+    <div style="display:flex;justify-content:flex-end;margin-bottom:.5rem">
+      <button class="btn sm" onclick="adminLogout()">🔓 Uitloggen</button>
     </div>
-    <div class="field">
-      <label>Datum</label>
-      <input type="date" id="trip-datum" />
+    <h2 style="font-size:16px;font-weight:600;margin-bottom:.75rem">Trips</h2>
+    <div class="card">
+      <div class="card-title">Nieuwe trip aanmaken</div>
+      <div class="field"><label>Naam</label><input type="text" id="trip-naam" placeholder="bv. Luxemburg juni 2026" /></div>
+      <div class="field"><label>Datum</label><input type="date" id="trip-datum" /></div>
+      <div class="field"><label>Notitie (optioneel)</label><input type="text" id="trip-notitie" placeholder="bv. Via Arlon, vertrek 08u" /></div>
+      <div class="btn-row"><button class="btn primary" onclick="createTrip()">+ Trip aanmaken</button></div>
     </div>
-    <div class="field">
-      <label>Notitie (optioneel)</label>
-      <input type="text" id="trip-notitie" placeholder="bv. Via Arlon, vertrek 08u" />
+    <div class="card">
+      <div class="card-title">Bestaande trips</div>
+      <div id="trip-list-beheer"></div>
     </div>
-    <div class="btn-row">
-      <button class="btn primary" onclick="createTrip()">+ Trip aanmaken</button>
+    <h2 style="font-size:16px;font-weight:600;margin:.75rem 0">Catalogus</h2>
+    <div class="card">
+      <div class="card-title">Product toevoegen</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="field"><label>Naam</label><input type="text" id="prod-naam" placeholder="bv. Jupiler 24-pack" /></div>
+        <div class="field"><label>Eenheid</label><input type="text" id="prod-eenheid" placeholder="pak, fles, sloef…" /></div>
+      </div>
+      <div class="field"><label>Categorie</label>
+        <select id="prod-cat"><option value="drank">🍺 Drank</option><option value="tabak">🚬 Tabak</option></select>
+      </div>
+      <div class="btn-row"><button class="btn primary" onclick="addProduct()">+ Toevoegen</button></div>
     </div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">Bestaande trips</div>
-    <div id="trip-list-beheer"></div>
-  </div>
-
-  <h2 style="font-size:16px;font-weight:600;margin:.75rem 0">Catalogus</h2>
-
-  <div class="card">
-    <div class="card-title">Product toevoegen</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-      <div class="field">
-        <label>Naam</label>
-        <input type="text" id="prod-naam" placeholder="bv. Jupiler 24-pack" />
-      </div>
-      <div class="field">
-        <label>Eenheid</label>
-        <input type="text" id="prod-eenheid" placeholder="pak, fles, doos…" />
-      </div>
+      <div class="card"><div class="card-title">🍺 Drank</div><div id="cat-drank-list"></div></div>
+      <div class="card"><div class="card-title">🚬 Tabak</div><div id="cat-tabak-list"></div></div>
     </div>
-    <div class="field">
-      <label>Categorie</label>
-      <select id="prod-cat">
-        <option value="drank">🍺 Drank</option>
-        <option value="tabak">🚬 Tabak</option>
-      </select>
-    </div>
-    <div class="btn-row">
-      <button class="btn primary" onclick="addProduct()">+ Toevoegen</button>
-    </div>
+    <div style="height:2rem"></div>
   </div>
-
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-    <div class="card">
-      <div class="card-title">🍺 Drank</div>
-      <div id="cat-drank-list"></div>
-    </div>
-    <div class="card">
-      <div class="card-title">🚬 Tabak</div>
-      <div id="cat-tabak-list"></div>
-    </div>
-  </div>
-
-  <div style="height:2rem"></div>
-  </div><!-- end beheer-content -->
 </div>
 
-<script>
-// ── Storage helpers ──────────────────────────────────────────────
-const S = {
-  get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch(e) { return null; } },
-  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch(e) {} }
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, set, get, push, remove, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyD0lQHa3C7BtARQR-9fjCtMTXb-aMWeWjA",
+  authDomain: "luxemburg-bestellingen.firebaseapp.com",
+  databaseURL: "https://luxemburg-bestellingen-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "luxemburg-bestellingen",
+  storageBucket: "luxemburg-bestellingen.firebasestorage.app",
+  messagingSenderId: "559300634963",
+  appId: "1:559300634963:web:3905ed01c1c4e33a6599a6"
 };
 
-// ── Default catalog ──────────────────────────────────────────────
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
 const defaultCatalog = {
   drank: [
     {id:'d1', naam:'Jupiler 24×25cl', eenheid:'pak'},
@@ -467,28 +248,54 @@ const defaultCatalog = {
   ]
 };
 
-// ── State ────────────────────────────────────────────────────────
-let trips   = S.get('lux_trips')   || [];
-let orders  = S.get('lux_orders')  || [];
-let catalog = S.get('lux_catalog') || JSON.parse(JSON.stringify(defaultCatalog));
-let cart    = {};
+let trips = [];
+let orders = [];
+let catalog = JSON.parse(JSON.stringify(defaultCatalog));
+let cart = {};
 let customRows = { drank: [], tabak: [] };
 
-function save() {
-  S.set('lux_trips',   trips);
-  S.set('lux_orders',  orders);
-  S.set('lux_catalog', catalog);
-}
-
-// ── Admin auth ───────────────────────────────────────────────────
 const ADMIN_PW = 'luxemburg2026';
 const ADMIN_KEY = 'lux_admin_unlocked';
 
-function isAdminUnlocked() {
-  return sessionStorage.getItem(ADMIN_KEY) === '1';
+// ── Firebase laden ────────────────────────────────────────────────
+async function loadData() {
+  document.getElementById('header-sub').textContent = 'Laden...';
+  try {
+    const [tripsSnap, ordersSnap, catalogSnap] = await Promise.all([
+      get(ref(db, 'trips')),
+      get(ref(db, 'orders')),
+      get(ref(db, 'catalog'))
+    ]);
+    trips  = tripsSnap.exists()   ? Object.entries(tripsSnap.val()).map(([k,v])=>({...v,_key:k}))   : [];
+    orders = ordersSnap.exists()  ? Object.entries(ordersSnap.val()).map(([k,v])=>({...v,_key:k}))  : [];
+    catalog = catalogSnap.exists() ? catalogSnap.val() : JSON.parse(JSON.stringify(defaultCatalog));
+  } catch(e) {
+    console.error(e);
+  }
+  document.getElementById('header-sub').textContent = 'Selecteer een trip om te bestellen';
+  renderAll();
 }
 
-function checkAdminPw() {
+// Live updates
+onValue(ref(db, 'trips'), snap => {
+  trips = snap.exists() ? Object.entries(snap.val()).map(([k,v])=>({...v,_key:k})) : [];
+  renderTripSelects(); renderBeheerTrips(); renderOverzicht();
+});
+onValue(ref(db, 'orders'), snap => {
+  orders = snap.exists() ? Object.entries(snap.val()).map(([k,v])=>({...v,_key:k})) : [];
+  renderOverzicht();
+});
+onValue(ref(db, 'catalog'), snap => {
+  if (snap.exists()) { catalog = snap.val(); renderBestelLists(); renderCatalogLists(); }
+});
+
+// ── Opslaan ───────────────────────────────────────────────────────
+async function saveCatalog() { await set(ref(db, 'catalog'), catalog); }
+
+// ── Admin ─────────────────────────────────────────────────────────
+function isAdminUnlocked() { return sessionStorage.getItem(ADMIN_KEY) === '1'; }
+
+window.checkAdminPw = function() {
   const val = document.getElementById('admin-pw-input').value;
   const errEl = document.getElementById('pw-error');
   if (val === ADMIN_PW) {
@@ -501,128 +308,132 @@ function checkAdminPw() {
     document.getElementById('admin-pw-input').value = '';
     document.getElementById('admin-pw-input').focus();
   }
-}
+};
 
 function showAdminContent() {
   document.getElementById('beheer-lock').style.display = 'none';
   document.getElementById('beheer-content').style.display = 'block';
   document.getElementById('tab-beheer-btn').style.display = '';
-  renderBeheerTrips();
-  renderCatalogLists();
+  renderBeheerTrips(); renderCatalogLists();
 }
 
-function adminLogout() {
+window.adminLogout = function() {
   sessionStorage.removeItem(ADMIN_KEY);
   document.getElementById('beheer-lock').style.display = 'block';
   document.getElementById('beheer-content').style.display = 'none';
   document.getElementById('tab-beheer-btn').style.display = 'none';
   showTab('bestellen');
-}
+};
 
-// ── Tab navigation ───────────────────────────────────────────────
-function showTab(name) {
+// ── Tabs ──────────────────────────────────────────────────────────
+window.showTab = function(name) {
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelector(`[onclick="showTab('${name}')"]`).classList.add('active');
   document.getElementById('page-' + name).classList.add('active');
   if (name === 'overzicht') renderOverzicht();
   if (name === 'beheer' && isAdminUnlocked()) showAdminContent();
-}
+};
 
-// ── Trip helpers ─────────────────────────────────────────────────
-function renderTripSelects() {
-  ['trip-select', 'overzicht-trip-select'].forEach(id => {
-    const sel = document.getElementById(id);
-    if (!sel) return;
-    sel.innerHTML = trips.length === 0
-      ? '<option value="">— nog geen trips —</option>'
-      : trips.map(t => `<option value="${t.id}">${t.naam}${t.datum ? ' · ' + fmtDate(t.datum) : ''}</option>`).join('');
-  });
-}
-
+// ── Trips ─────────────────────────────────────────────────────────
 function fmtDate(iso) {
   if (!iso) return '';
   const [y,m,d] = iso.split('-');
   return `${d}/${m}/${y}`;
 }
 
+function renderTripSelects() {
+  ['trip-select','overzicht-trip-select'].forEach(id => {
+    const sel = document.getElementById(id);
+    if (!sel) return;
+    sel.innerHTML = trips.length === 0
+      ? '<option value="">— nog geen trips —</option>'
+      : trips.map(t => `<option value="${t.id}">${t.naam}${t.datum?' · '+fmtDate(t.datum):''}</option>`).join('');
+  });
+}
+
 function onTripSelect() {
   const sel = document.getElementById('trip-select');
   const trip = trips.find(t => t.id === sel.value);
-  const infoEl   = document.getElementById('trip-info');
+  const infoEl = document.getElementById('trip-info');
   const closedEl = document.getElementById('trip-closed');
-  const formEl   = document.getElementById('order-form');
+  const formEl = document.getElementById('order-form');
   const headerSub = document.getElementById('header-sub');
-
-  infoEl.classList.remove('show');
-  closedEl.classList.remove('show');
-
-  if (!trip) {
-    formEl.style.display = 'none';
-    headerSub.textContent = 'Selecteer een trip om te bestellen';
-    return;
-  }
-
+  infoEl.classList.remove('show'); closedEl.classList.remove('show');
+  if (!trip) { formEl.style.display = 'none'; headerSub.textContent = 'Selecteer een trip'; return; }
   headerSub.textContent = trip.naam + (trip.datum ? ' · ' + fmtDate(trip.datum) : '');
-
-  if (trip.notitie) {
-    infoEl.textContent = '📝 ' + trip.notitie;
-    infoEl.classList.add('show');
-  }
-
+  if (trip.notitie) { infoEl.textContent = '📝 ' + trip.notitie; infoEl.classList.add('show'); }
   if (trip.status !== 'open') {
-    closedEl.textContent = '🔒 Deze trip is gesloten. Nieuwe bestellingen zijn niet meer mogelijk.';
+    closedEl.textContent = '🔒 Deze trip is gesloten.';
     closedEl.classList.add('show');
     formEl.style.display = 'none';
     return;
   }
-
   formEl.style.display = 'block';
-  cart = {};
-  customRows = { drank: [], tabak: [] };
-  renderBestelLists();
-  renderCustomSections();
+  cart = {}; customRows = { drank: [], tabak: [] };
+  renderBestelLists(); renderCustomSections();
 }
+window.onTripSelect = onTripSelect;
 
-// ── Bestel form ──────────────────────────────────────────────────
+window.createTrip = async function() {
+  const naam = document.getElementById('trip-naam').value.trim();
+  const datum = document.getElementById('trip-datum').value;
+  const notitie = document.getElementById('trip-notitie').value.trim();
+  if (!naam) return;
+  const id = 'trip' + Date.now();
+  await set(ref(db, 'trips/' + id), { id, naam, datum, notitie, status: 'open' });
+  document.getElementById('trip-naam').value = '';
+  document.getElementById('trip-datum').value = '';
+  document.getElementById('trip-notitie').value = '';
+};
+
+window.toggleTrip = async function(id, key) {
+  const t = trips.find(x => x.id === id);
+  if (t) await set(ref(db, 'trips/' + key + '/status'), t.status === 'open' ? 'closed' : 'open');
+};
+
+window.deleteTrip = async function(id, key) {
+  if (!confirm('Trip verwijderen?')) return;
+  await remove(ref(db, 'trips/' + key));
+  const toDelete = orders.filter(o => o.tripId === id);
+  for (const o of toDelete) await remove(ref(db, 'orders/' + o._key));
+};
+
+// ── Bestellen ─────────────────────────────────────────────────────
 function renderBestelLists() {
-  ['drank', 'tabak'].forEach(cat => {
+  ['drank','tabak'].forEach(cat => {
     const el = document.getElementById(cat + '-list');
     if (!el) return;
     const items = catalog[cat] || [];
-    if (items.length === 0) {
-      el.innerHTML = '<p style="font-size:13px;color:var(--text-faint)">Geen producten in catalogus.</p>';
-      return;
-    }
+    if (items.length === 0) { el.innerHTML = '<p style="font-size:13px;color:var(--text-faint)">Geen producten.</p>'; return; }
     el.innerHTML = items.map(p => `
       <div class="product-row">
         <div class="pname">${p.naam}<br><span class="punit">${p.eenheid}</span></div>
         <div class="qty-ctrl">
-          <button class="qty-btn" onclick="changeQty('${p.id}', -1)" aria-label="Minder">−</button>
+          <button class="qty-btn" onclick="changeQty('${p.id}',-1)">−</button>
           <span class="qty-val" id="qty-${p.id}">0</span>
-          <button class="qty-btn" onclick="changeQty('${p.id}', 1)" aria-label="Meer">+</button>
+          <button class="qty-btn" onclick="changeQty('${p.id}',1)">+</button>
         </div>
       </div>`).join('');
   });
 }
 
-function changeQty(id, delta) {
-  cart[id] = Math.max(0, (cart[id] || 0) + delta);
+window.changeQty = function(id, delta) {
+  cart[id] = Math.max(0, (cart[id]||0) + delta);
   const el = document.getElementById('qty-' + id);
   if (el) el.textContent = cart[id];
-}
+};
 
-// Custom rows
-function addCustomRow(cat) {
-  const rid = 'cr_' + Date.now() + '_' + Math.random().toString(36).slice(2,6);
+window.addCustomRow = function(cat) {
+  const rid = 'cr_' + Date.now();
   customRows[cat].push(rid);
   renderCustomSection(cat);
-}
+};
 
-function removeCustomRow(cat, rid) {
+window.removeCustomRow = function(cat, rid) {
   customRows[cat] = customRows[cat].filter(r => r !== rid);
   renderCustomSection(cat);
-}
+};
 
 function renderCustomSection(cat) {
   const el = document.getElementById(cat + '-custom');
@@ -636,206 +447,122 @@ function renderCustomSection(cat) {
     </div>`).join('');
 }
 
-function renderCustomSections() {
-  renderCustomSection('drank');
-  renderCustomSection('tabak');
-}
+function renderCustomSections() { renderCustomSection('drank'); renderCustomSection('tabak'); }
 
 function getCustomItems(cat) {
   return customRows[cat].map(rid => {
-    const naam = (document.getElementById(rid + '_naam')?.value || '').trim();
-    const qty  = parseInt(document.getElementById(rid + '_qty')?.value || '0') || 0;
-    if (!naam && qty === 0) return null;
-    return { naam: naam || '(geen naam)', qty, cat, custom: true };
+    const naam = (document.getElementById(rid+'_naam')?.value||'').trim();
+    const qty = parseInt(document.getElementById(rid+'_qty')?.value||'0')||0;
+    if (!naam && qty===0) return null;
+    return { naam: naam||'(geen naam)', qty, cat, custom:true };
   }).filter(Boolean);
 }
 
-function submitOrder() {
+window.submitOrder = async function() {
   const naam = document.getElementById('naam').value.trim();
   const alertEl = document.getElementById('order-alert');
-
-  if (!naam) {
-    showAlert(alertEl, 'Vul eerst jouw naam in.', 'info');
-    return;
-  }
-
-  const allProds = [...(catalog.drank||[]), ...(catalog.tabak||[])];
-  const catalogItems = allProds
-    .filter(p => (cart[p.id]||0) > 0)
-    .map(p => ({
-      naam: p.naam, qty: cart[p.id],
-      cat: (catalog.drank||[]).find(d=>d.id===p.id) ? 'drank' : 'tabak',
-      eenheid: p.eenheid, custom: false
-    }));
-
-  const customItems = [...getCustomItems('drank'), ...getCustomItems('tabak')];
-  const items = [...catalogItems, ...customItems];
-
-  if (items.length === 0) {
-    showAlert(alertEl, 'Voeg minstens één product toe.', 'info');
-    return;
-  }
-
+  if (!naam) { showAlert(alertEl,'Vul eerst jouw naam in.','info'); return; }
+  const allProds = [...(catalog.drank||[]),...(catalog.tabak||[])];
+  const catalogItems = allProds.filter(p=>(cart[p.id]||0)>0).map(p=>({
+    naam:p.naam, qty:cart[p.id],
+    cat:(catalog.drank||[]).find(d=>d.id===p.id)?'drank':'tabak',
+    eenheid:p.eenheid, custom:false
+  }));
+  const customItems = [...getCustomItems('drank'),...getCustomItems('tabak')];
+  const items = [...catalogItems,...customItems];
+  if (items.length===0) { showAlert(alertEl,'Voeg minstens één product toe.','info'); return; }
   const tripId = document.getElementById('trip-select').value;
-  const order = {
-    id: 'o' + Date.now(),
-    tripId, naam, items,
-    ts: new Date().toISOString()
-  };
+  const order = { id:'o'+Date.now(), tripId, naam, items, ts: new Date().toISOString() };
+  await push(ref(db,'orders'), order);
+  cart={}; customRows={drank:[],tabak:[]};
+  renderBestelLists(); renderCustomSections();
+  document.getElementById('naam').value='';
+  showAlert(alertEl,`✅ Bestelling van ${naam} ingediend! (${items.length} product${items.length!==1?'en':''})`, 'success');
+  window.scrollTo({top:0,behavior:'smooth'});
+};
 
-  orders.push(order);
-  save();
-
-  cart = {};
-  customRows = { drank: [], tabak: [] };
-  renderBestelLists();
-  renderCustomSections();
-  document.getElementById('naam').value = '';
-
-  showAlert(alertEl, `✅ Bestelling van ${naam} ingediend! (${items.length} product${items.length!==1?'en':''})`, 'success');
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-function showAlert(el, msg, type) {
-  el.className = 'alert ' + type + ' show';
-  el.textContent = msg;
-  clearTimeout(el._timer);
-  el._timer = setTimeout(() => el.classList.remove('show'), 5000);
-}
-
-// ── Overzicht ────────────────────────────────────────────────────
+// ── Overzicht ─────────────────────────────────────────────────────
 function renderOverzicht() {
-  const sel    = document.getElementById('overzicht-trip-select');
+  const sel = document.getElementById('overzicht-trip-select');
   const tripId = sel?.value;
-  const trip   = trips.find(t => t.id === tripId) || trips[0];
-  const filtered = trip ? orders.filter(o => o.tripId === trip.id) : [];
-
-  const stats = document.getElementById('stats-grid');
-  const totalItems = filtered.reduce((s,o) => s + o.items.reduce((ss,i)=>ss+i.qty,0), 0);
-  stats.innerHTML = `
+  const trip = trips.find(t=>t.id===tripId)||trips[0];
+  const filtered = trip ? orders.filter(o=>o.tripId===trip.id) : [];
+  const totalItems = filtered.reduce((s,o)=>s+o.items.reduce((ss,i)=>ss+i.qty,0),0);
+  document.getElementById('stats-grid').innerHTML = `
     <div class="stat-card"><div class="stat-val">${filtered.length}</div><div class="stat-lbl">Bestellingen</div></div>
     <div class="stat-card"><div class="stat-val">${totalItems}</div><div class="stat-lbl">Producten totaal</div></div>
-    <div class="stat-card"><div class="stat-val">${trip ? (trip.status==='open'?'Open':'Gesloten') : '—'}</div><div class="stat-lbl">Status trip</div></div>
-  `;
-
+    <div class="stat-card"><div class="stat-val">${trip?(trip.status==='open'?'Open':'Gesloten'):'—'}</div><div class="stat-lbl">Status trip</div></div>`;
   const list = document.getElementById('orders-list');
-  if (filtered.length === 0) {
-    list.innerHTML = '<div class="empty-state"><div class="icon">📭</div><p>Nog geen bestellingen voor deze trip.</p></div>';
-    document.getElementById('totaal-summary').innerHTML = '';
+  if (filtered.length===0) {
+    list.innerHTML='<div class="empty-state"><div class="icon">📭</div><p>Nog geen bestellingen voor deze trip.</p></div>';
+    document.getElementById('totaal-summary').innerHTML='';
     return;
   }
-
-  list.innerHTML = filtered.map(o => `
+  list.innerHTML = filtered.map(o=>`
     <div class="order-card">
       <div class="order-header">
         <span class="order-person">👤 ${o.naam}</span>
-        <span class="order-date">${new Date(o.ts).toLocaleDateString('nl-BE', {day:'2-digit',month:'short',year:'numeric'})}</span>
+        <span class="order-date">${new Date(o.ts).toLocaleDateString('nl-BE',{day:'2-digit',month:'short',year:'numeric'})}</span>
       </div>
-      ${o.items.map(i => `
-        <div class="order-item">
-          <span><span class="cat-badge cat-${i.cat}">${i.cat}</span> ${i.naam}${i.custom?' <em style="font-size:11px;color:var(--text-faint)">(eigen)</em>':''}</span>
-          <span class="qty-tag">${i.qty}×</span>
-        </div>`).join('')}
+      ${o.items.map(i=>`<div class="order-item"><span><span class="cat-badge cat-${i.cat}">${i.cat}</span> ${i.naam}${i.custom?' <em style="font-size:11px;color:var(--text-faint)">(eigen)</em>':''}</span><span class="qty-tag">${i.qty}×</span></div>`).join('')}
     </div>`).join('');
-
-  // Boodschappenlijst
-  const totals = {};
-  filtered.forEach(o => o.items.forEach(i => {
-    const key = i.naam;
-    if (!totals[key]) totals[key] = { qty:0, cat:i.cat };
-    totals[key].qty += i.qty;
+  const totals={};
+  filtered.forEach(o=>o.items.forEach(i=>{
+    if(!totals[i.naam]) totals[i.naam]={qty:0,cat:i.cat};
+    totals[i.naam].qty+=i.qty;
   }));
-
-  const sorted = Object.entries(totals).sort((a,b) => b[1].qty - a[1].qty);
-  document.getElementById('totaal-summary').innerHTML = `
-    <div class="card" style="margin-top:.5rem">
-      <div class="card-title">🛍️ Boodschappenlijst</div>
-      <ul class="summary-list">
-        ${sorted.map(([naam,v]) => `
-          <li>
-            <span><span class="cat-badge cat-${v.cat}">${v.cat}</span> ${naam}</span>
-            <span class="summary-qty">${v.qty}×</span>
-          </li>`).join('')}
-      </ul>
-    </div>`;
+  document.getElementById('totaal-summary').innerHTML=`
+    <div class="card"><div class="card-title">🛍️ Boodschappenlijst</div>
+    <ul class="summary-list">${Object.entries(totals).sort((a,b)=>b[1].qty-a[1].qty).map(([naam,v])=>`
+      <li><span><span class="cat-badge cat-${v.cat}">${v.cat}</span> ${naam}</span><span class="summary-qty">${v.qty}×</span></li>`).join('')}
+    </ul></div>`;
 }
 
-// ── Beheer ───────────────────────────────────────────────────────
-function createTrip() {
-  const naam    = document.getElementById('trip-naam').value.trim();
-  const datum   = document.getElementById('trip-datum').value;
-  const notitie = document.getElementById('trip-notitie').value.trim();
-  if (!naam) return;
-  trips.push({ id: 'trip' + Date.now(), naam, datum, notitie, status: 'open' });
-  save();
-  renderAll();
-  document.getElementById('trip-naam').value = '';
-  document.getElementById('trip-datum').value = '';
-  document.getElementById('trip-notitie').value = '';
-}
-
-function toggleTrip(id) {
-  const t = trips.find(x => x.id === id);
-  if (t) { t.status = t.status === 'open' ? 'closed' : 'open'; save(); renderAll(); }
-}
-
-function deleteTrip(id) {
-  if (!confirm('Trip verwijderen? Bestellingen van deze trip worden ook verwijderd.')) return;
-  trips   = trips.filter(t => t.id !== id);
-  orders  = orders.filter(o => o.tripId !== id);
-  save(); renderAll();
-}
-
+// ── Beheer trips ──────────────────────────────────────────────────
 function renderBeheerTrips() {
   const el = document.getElementById('trip-list-beheer');
   if (!el) return;
-  if (trips.length === 0) {
-    el.innerHTML = '<div class="empty-state" style="padding:1rem 0"><p>Nog geen trips aangemaakt.</p></div>';
-    return;
-  }
-  el.innerHTML = trips.map(t => {
-    const cnt = orders.filter(o => o.tripId === t.id).length;
+  if (trips.length===0) { el.innerHTML='<p style="font-size:13px;color:var(--text-faint)">Nog geen trips.</p>'; return; }
+  el.innerHTML = trips.map(t=>{
+    const cnt = orders.filter(o=>o.tripId===t.id).length;
     return `<div class="trip-row">
       <div class="trip-info">
         <div class="trip-name">${t.naam}</div>
-        <div class="trip-meta">${t.datum ? fmtDate(t.datum) + ' · ' : ''}${cnt} bestelling${cnt!==1?'en':''}</div>
-        ${t.notitie ? `<div class="trip-meta">📝 ${t.notitie}</div>` : ''}
+        <div class="trip-meta">${t.datum?fmtDate(t.datum)+' · ':''}${cnt} bestelling${cnt!==1?'en':''}</div>
+        ${t.notitie?`<div class="trip-meta">📝 ${t.notitie}</div>`:''}
       </div>
       <span class="badge ${t.status==='open'?'open':'closed'}">${t.status==='open'?'Open':'Gesloten'}</span>
-      <button class="btn sm" onclick="toggleTrip('${t.id}')">${t.status==='open'?'Sluiten':'Heropenen'}</button>
-      <button class="btn sm danger" onclick="deleteTrip('${t.id}')">🗑</button>
+      <button class="btn sm" onclick="toggleTrip('${t.id}','${t._key}')">${t.status==='open'?'Sluiten':'Heropenen'}</button>
+      <button class="btn sm danger" onclick="deleteTrip('${t.id}','${t._key}')">🗑</button>
     </div>`;
   }).join('');
 }
 
-// ── Catalogus ────────────────────────────────────────────────────
-function addProduct() {
-  const naam    = document.getElementById('prod-naam').value.trim();
-  const eenheid = document.getElementById('prod-eenheid').value.trim() || 'stuk';
-  const cat     = document.getElementById('prod-cat').value;
+// ── Catalogus ─────────────────────────────────────────────────────
+window.addProduct = async function() {
+  const naam = document.getElementById('prod-naam').value.trim();
+  const eenheid = document.getElementById('prod-eenheid').value.trim()||'stuk';
+  const cat = document.getElementById('prod-cat').value;
   if (!naam) return;
-  if (!catalog[cat]) catalog[cat] = [];
-  catalog[cat].push({ id: 'p' + Date.now(), naam, eenheid });
-  save(); renderCatalogLists(); renderBestelLists();
-  document.getElementById('prod-naam').value = '';
-  document.getElementById('prod-eenheid').value = '';
-}
+  if (!catalog[cat]) catalog[cat]=[];
+  catalog[cat].push({id:'p'+Date.now(), naam, eenheid});
+  await saveCatalog();
+  document.getElementById('prod-naam').value='';
+  document.getElementById('prod-eenheid').value='';
+};
 
-function deleteProduct(cat, id) {
-  catalog[cat] = (catalog[cat]||[]).filter(p => p.id !== id);
-  save(); renderCatalogLists(); renderBestelLists();
-}
+window.deleteProduct = async function(cat, id) {
+  catalog[cat]=(catalog[cat]||[]).filter(p=>p.id!==id);
+  await saveCatalog();
+};
 
 function renderCatalogLists() {
-  ['drank','tabak'].forEach(cat => {
-    const el = document.getElementById('cat-' + cat + '-list');
-    if (!el) return;
-    const items = catalog[cat] || [];
-    if (items.length === 0) {
-      el.innerHTML = '<p style="font-size:12px;color:var(--text-faint)">Leeg.</p>';
-      return;
-    }
-    el.innerHTML = items.map(p => `
+  ['drank','tabak'].forEach(cat=>{
+    const el=document.getElementById('cat-'+cat+'-list');
+    if(!el) return;
+    const items=catalog[cat]||[];
+    if(items.length===0){el.innerHTML='<p style="font-size:12px;color:var(--text-faint)">Leeg.</p>';return;}
+    el.innerHTML=items.map(p=>`
       <div class="product-row" style="padding:7px 0">
         <div class="pname" style="font-size:13px">${p.naam}<br><span class="punit">${p.eenheid}</span></div>
         <button class="btn sm danger" onclick="deleteProduct('${cat}','${p.id}')">🗑</button>
@@ -843,20 +570,21 @@ function renderCatalogLists() {
   });
 }
 
-// ── Init ─────────────────────────────────────────────────────────
-function renderAll() {
-  renderTripSelects();
-  onTripSelect();
-  renderBestelLists();
-  renderCustomSections();
-  renderCatalogLists();
-  renderBeheerTrips();
-  renderOverzicht();
+// ── Helpers ───────────────────────────────────────────────────────
+function showAlert(el, msg, type) {
+  el.className='alert '+type+' show'; el.textContent=msg;
+  clearTimeout(el._timer);
+  el._timer=setTimeout(()=>el.classList.remove('show'),5000);
 }
 
-renderAll();
+function renderAll() {
+  renderTripSelects(); onTripSelect(); renderBestelLists();
+  renderCustomSections(); renderCatalogLists(); renderBeheerTrips(); renderOverzicht();
+}
 
-// ── Auto-unlock via ?admin in URL ─────────────────────────────────
+// ── Init ──────────────────────────────────────────────────────────
+await loadData();
+
 if (window.location.search.includes('admin')) {
   sessionStorage.setItem(ADMIN_KEY, '1');
   document.getElementById('tab-beheer-btn').style.display = '';
