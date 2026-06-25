@@ -855,6 +855,14 @@ function renderAll() {
 }
 
 renderAll();
+
+// ── Auto-unlock via ?admin in URL ─────────────────────────────────
+if (window.location.search.includes('admin')) {
+  sessionStorage.setItem(ADMIN_KEY, '1');
+  document.getElementById('tab-beheer-btn').style.display = '';
+  showTab('beheer');
+  showAdminContent();
+}
 </script>
 </body>
 </html>
